@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"fmt"
 	"waiig/token"
 )
 
@@ -17,13 +18,27 @@ func New(input string) *Lexer {
 	return l
 }
 
+func (l *Lexer) peekChar() byte {
+    if l.readPosition > len(l.input) {
+        return 0
+    } else {
+        return l.input[l.readPosition]
+    }
+}
+
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
     l.skipWhitespace()
 	switch l.ch {
 	case '=':
-		tok = newToken(token.ASSIGN, l.ch)
+        if l.peekChar() == '=' {
+            tok.Literal = fmt.Sprintf("%s%s", string(l.input[l.position]), string(l.input[l.readPosition]))
+            tok.Type = token.EQ
+            l.readChar()
+        } else {
+            tok = newToken(token.ASSIGN, l.ch)
+        }
 	case ';':
 		tok = newToken(token.SEMICOLON, l.ch)
 	case '(':
@@ -34,20 +49,38 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.COMMA, l.ch)
 	case '+':
 		tok = newToken(token.PLUS, l.ch)
+	case '-':
+		tok = newToken(token.MINUS, l.ch)
 	case '{':
 		tok = newToken(token.LBRACE, l.ch)
 	case '}':
 		tok = newToken(token.RBRACE, l.ch)
+	case '!':
+        if l.peekChar() == '=' {
+            tok.Literal = fmt.Sprintf("%s%s", string(l.input[l.position]), string(l.input[l.readPosition]))
+            tok.Type = token.NOT_EQ
+            l.readChar()
+        } else {
+            tok = newToken(token.BANG, l.ch)
+        }
+	case '*':
+		tok = newToken(token.ASTERISK, l.ch)
+	case '/':
+		tok = newToken(token.SLASH, l.ch)
+	case '<':
+		tok = newToken(token.LT, l.ch)
+	case '>':
+		tok = newToken(token.GT, l.ch)
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
     default:
         if isLetter(l.ch) {
-            tok.Literal = l.readChars(isLetter)
+            tok.Literal = l.readWord(isLetter)
             tok.Type = token.LookupIdent(tok.Literal)
             return tok
         } else if isDigit(l.ch) {
-            tok.Literal = l.readChars(isDigit)
+            tok.Literal = l.readWord(isDigit)
             tok.Type = token.INT
             return tok
         } else {
@@ -61,7 +94,7 @@ func (l *Lexer) NextToken() token.Token {
 
 type charIdentificator func(byte) bool
 
-func (l *Lexer) readChars(fn charIdentificator) string {
+func (l *Lexer) readWord(fn charIdentificator) string {
     position := l.position
     for fn(l.ch) {
         l.readChar()
