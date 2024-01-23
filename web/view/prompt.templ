@@ -1,0 +1,12 @@
+package view
+
+templ Prompt(p string) {
+  <div>
+     <label for="in">{p}</label>
+     <textarea type="text" name="in" 
+        hx-post="/" 
+        hx-trigger="keyup[keyCode==13]"
+        hx-swap="outerHTML"></textarea>
+  </div>
+}
+

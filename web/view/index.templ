@@ -1,0 +1,28 @@
+package view
+
+templ Index() {
+  <head>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+      body {
+        background-color: #101010;
+        color: green;
+      }
+      .flex-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+      textarea {
+        border: none;
+        outline: none;
+        background-color: transparent;
+        color: green;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body class="flex-container">
+    @Prompt(">>")
+  </body>
+}

@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
-	"os"
+	"github.com/labstack/echo/v4"
+	// "os"
 	"os/user"
-	"waiig/repl"
+	// "waiig/repl"
+	"waiig/web/webrepl"
 )
 
 func main() {
@@ -14,5 +16,12 @@ func main() {
 	}
 
 	fmt.Printf("Hello %s\n", u.Username)
-	repl.Start(os.Stdin, os.Stdout)
+	server := echo.New()
+
+	server.GET("/", webrepl.HandleIndex)
+	server.POST("/", webrepl.HandleEvaluate)
+
+	server.Start(":8080")
+
+	// repl.Start(os.Stdin, os.Stdout)
 }
